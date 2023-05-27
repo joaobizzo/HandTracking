@@ -4,6 +4,7 @@ import mediapipe as mp
 
 mp_maos = mp.solutions.hands
 mp_desenho = mp.solutions.drawing_utils
+maos = mp_maos.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5)
 
 cor_linha = (224, 208, 64)
 cor_bola = (255, 255, 255)
@@ -23,7 +24,7 @@ terminal = "Camera iniciada"
 print(terminal)
 
 
-def encontra_coord_maos(im):
+def encontra_coord_maos(img):
     #espelhar imagem
     img = cv2.flip(img, 1) 
     #converter de RGB para BGR(padrao opencv)
@@ -45,15 +46,15 @@ def encontra_coord_maos(im):
 
 
 
-with mp_maos.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5) as maos:
-    #loop principal do codigo
-    while camera.isOpened():
 
-        sucesso, img = camera.read()
-        img = encontra_coord_maos(img)
-        
-        cv2.imshow("Imagem", img)
+#loop principal do codigo
+while camera.isOpened():
 
-        tecla = cv2.waitKey(1)
-        if tecla == 27:
-            break
+    sucesso, img = camera.read()
+    img = encontra_coord_maos(img)
+    
+    cv2.imshow("Imagem", img)
+
+    tecla = cv2.waitKey(1)
+    if tecla == 27:
+        break

@@ -18,8 +18,10 @@ resolucao_x = 1280
 resolucao_y = 720
 camera.set(cv2.CAP_PROP_FRAME_WIDTH, resolucao_x)
 camera.set(cv2.CAP_PROP_FRAME_HEIGHT, resolucao_y)
-print("camera iniciada")
-terminal = "camera nao encontrada"
+
+x = 0
+terminal = "Camera iniciada"
+print(terminal)
 
 
 
@@ -35,17 +37,18 @@ while camera.isOpened():
 
     resultado = maos.process(img_rgb)
 
-    if resultado.multi_hand_landmarks:
+    if resultado.multi_hand_landmarks: #se encontrar a mao
         for marcacao_maos in resultado.multi_hand_landmarks:
             mp_desenho.draw_landmarks(img, marcacao_maos, mp_maos.HAND_CONNECTIONS,
                                     mp_desenho.DrawingSpec(color=cor_bola, thickness=2, circle_radius=2),
                                     mp_desenho.DrawingSpec(color=cor_linha, thickness=2, circle_radius=2))
         if terminal != "mao encontrada":
-            print("mao encontrada")
             terminal = "mao encontrada"
-    else:
-        terminal = "mao nao encontrada"
-        print(terminal)
+            print(terminal)
+    else: #se nao encontrar a mao
+        if terminal != "mao nao encontrada":
+            terminal = "mao nao encontrada"
+            print(terminal)
     
     cv2.imshow("Imagem", img)
 

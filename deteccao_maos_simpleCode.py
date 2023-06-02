@@ -42,14 +42,11 @@ while camera.isOpened():
             mp_desenho.draw_landmarks(img, marcacao_maos, mp_maos.HAND_CONNECTIONS,
                                     mp_desenho.DrawingSpec(color=cor_bola, thickness=2, circle_radius=2),
                                     mp_desenho.DrawingSpec(color=cor_linha, thickness=2, circle_radius=2))
-        if terminal != "mao encontrada":
-            terminal = "mao encontrada"
-            print(terminal)
+        terminal = "mao encontrada"
     else: #se nao encontrar a mao
-        if terminal != "mao nao encontrada":
-            terminal = "mao nao encontrada"
-            print(terminal)
-    
+        terminal = "mao nao encontrada"
+  
+    print(terminal)
     cv2.imshow("Imagem", img)
 
     tecla = cv2.waitKey(1)

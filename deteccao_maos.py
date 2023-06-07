@@ -1,4 +1,4 @@
-# not working
+#not working
 
 import cv2
 import mediapipe as mp
@@ -39,11 +39,13 @@ def encontra_coord_maos(img):
                 coord_x, coord_y, coord_z = int(marcacao.x * resolucao_x), int(marcacao.y * resolucao_y), int(marcacao.z * resolucao_x)
                 #print(coord_x, coord_y, coord_z)
             mp_desenho.draw_landmarks(img, marcacoes_maos, mp_maos.HAND_CONNECTIONS,
-                                    mp_desenho.DrawingSpec(color=cor_bola, thickness=2, circle_radius=3),
+                                    mp_desenho.DrawingSpec(color=cor_bola, thickness=2, circle_radius=2),
                                     mp_desenho.DrawingSpec(color=cor_linha, thickness=2, circle_radius=2))
         terminal = "Mao encontrada"
     else:
         terminal = "Mao nao encontrada"
+    
+    return img
 
 
 

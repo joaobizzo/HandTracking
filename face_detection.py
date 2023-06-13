@@ -22,7 +22,9 @@ while webcam.isOpened():
         print("Not founded")
 
     cv2.imshow("Face recognitier",img)
-    if cv2.waitKey(5) & 0xFF == ord("q"):
+
+    key = cv2.waitKey(5)
+    if key == 27: # esc key
         break
 
 webcam.release()

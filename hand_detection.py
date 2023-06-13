@@ -1,13 +1,23 @@
 import cv2
 import mediapipe as mp
+import os
+import webbrowser
+import time
 
 #  Setting detection parameters
 num_hands = 2
 min_detection_confidence = 0.8
 min_tracking_confidence = 0.5
+
 #  Drawing parameters
+
+# --colors in BGR: // TODO: create a function to put rgb and convert to bgr
 line_color = (224, 208, 64)
 ball_color = (255, 255, 255)
+keyborad_color = (194, 178, 2)
+WHITE = (255, 255, 255)
+BLACK = (15, 15, 15)
+
 
 mp_hands = mp.solutions.hands
 mp_draws = mp.solutions.drawing_utils
@@ -22,6 +32,15 @@ resolution_x = 1280
 resolution_y = 720
 cam.set(cv2.CAP_PROP_FRAME_WIDTH, resolution_x)
 cam.set(cv2.CAP_PROP_FRAME_HEIGHT, resolution_y)
+
+# special parameters
+rock_and_roll = False
+
+keys = [['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+        ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+        ['Z', 'X', 'C', 'V','B', 'N', 'M', ',', '.', '']]
+offset = 80
+
 
 #  Function to verify if the camera was successfully initialized
 def verify_cam_success(camera_success):
@@ -58,6 +77,7 @@ def find_hand_coordinates(img, mirror=False):
                 coordinates.append([coord_x, coord_y, coord_z])
                 # print(coord_x, coord_y, coord_z)
             hand_info["coordinates"] = coordinates
+            hand_info["side"] = hand_side.classification[0].label
 
             all_hands.append(hand_info)
             mp_draws.draw_landmarks(img, hand_landmarks, mp_hands.HAND_CONNECTIONS,
@@ -79,17 +99,46 @@ def count_raised_fingers(hand):
             fingers.append(False)
     return fingers
 
+
+def print_keyboard(img, position, letter, size=50, color=WHITE):
+    cv2.rectangle(img, position, (position[0]+size, position[1]+size), keyborad_color, cv2.FILLED)
+    cv2.rectangle(img, position, (position[0]+size, position[1]+size), BLACK, 1)
+    cv2.putText(img, letter, (position[0]+15, position[1]+30), cv2.FONT_HERSHEY_PLAIN, 2, WHITE, 3)
+    return img
+
 #  Main code loop
 while cam.isOpened():
     camera_success, img = cam.read()
     # verify_cam_success(camera_success)
+
     img, all_hands, success = find_hand_coordinates(img, mirror=True)
+
+    cv2.rectangle(img, (50, 50), (100, 100), keyborad_color, 2)
+    cv2.putText(img, 'X', (65, 85), cv2.FONT_HERSHEY_PLAIN, 2, WHITE, 3)
+
 
     if len(all_hands) == 1:
         hand1_finger_info = count_raised_fingers(all_hands[0])
-        print(hand1_finger_info)
+
+        if all_hands[0]['side'] == 'Left':
+            for index_line, keyboard_line in enumerate(keys):
+                for index, key in enumerate(keyboard_line):
+                    img = print_keyboard(img, (offset+index*60, offset+index_line*60), key)
+        
+        if all_hands[0]['side'] == 'Right':
+            if hand1_finger_info == [True, False, False, True] and rock_and_roll == False:
+                rock_and_roll = True
+                print("Rock and roll baby")
+                #time.sleep(2)
+                #webbrowser.open("https://www.youtube.com/watch?v=pAgnJDJN4VA")
+            
+
+
+        
     cv2.imshow("Image", img)
     # success_terminal(success)
+
+    
 
     key = cv2.waitKey(1)
     if key == 27: #esc key

@@ -101,15 +101,16 @@ while cam.isOpened():
     sucesso_camera, img = cam.read()
     #verify_cam_sucess(sucesso_camera)
     img, todas_maos, sucesso = encontra_coord_maos(img, espelho=True)
+    
 
     
 
     if len(todas_maos) == 1:
-
         thumb_tip = todas_maos[0]['coordenadas'][4]
         index_finger_tip = todas_maos[0]['coordenadas'][8]
         # Calculate the Euclidean distance between thumb and index finger tips
         distance = ((thumb_tip[0] - index_finger_tip[0])**2 + (thumb_tip[1] - index_finger_tip[1])**2)**0.5
+        
 
         # Print the distance
         print("Distance between thumb and index finger:", distance)
@@ -121,26 +122,28 @@ while cam.isOpened():
         hand_x_center = todas_maos[0]['coordenadas'][9][0]
         hand_y_center = todas_maos[0]['coordenadas'][9][1]
         
-        if info_dedos_mao1 == [True, True, True, True]:
-            cv2.circle(img, (hand_x_center, hand_y_center), 10, purple, -1)
+        
+        cv2.circle(img, (hand_x_center, hand_y_center), 10, purple, -1)
 
-            x, y = hand_x_center, hand_y_center
+        x, y = hand_x_center, hand_y_center
+        current_x, current_y = pyautogui.position()
+        delta_x = x - current_x
+        delta_y = y - current_y
+        acceleration = 1.5  # Adjust this value to control the acceleration
+        
+        while abs(delta_x) > 1 or abs(delta_y) > 1:
+            delta_x *= acceleration
+            delta_y *= acceleration
+            x = current_x + delta_x
+            y = current_y + delta_y
+            pyautogui.moveTo(x, y, duration=0.3)
             current_x, current_y = pyautogui.position()
             delta_x = x - current_x
             delta_y = y - current_y
-            acceleration = 1.5  # Adjust this value to control the acceleration
-            
-            while abs(delta_x) > 1 or abs(delta_y) > 1:
-                delta_x *= acceleration
-                delta_y *= acceleration
-                x = current_x + delta_x
-                y = current_y + delta_y
-                pyautogui.moveTo(x, y, duration=0.3)
-                current_x, current_y = pyautogui.position()
-                delta_x = x - current_x
-                delta_y = y - current_y
-            if distance < 30:
-                pyautogui.click()
+        if distance < 30:
+            pyautogui.click()
+            cv2.circle(img, (hand_x_center, hand_y_center), 10, black, -1)
+
         
 
       

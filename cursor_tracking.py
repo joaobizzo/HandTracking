@@ -1,6 +1,5 @@
 import cv2
 import mediapipe as mp
-import mouse
 import pyautogui
 
 
@@ -106,6 +105,16 @@ while cam.isOpened():
     
 
     if len(todas_maos) == 1:
+
+        thumb_tip = todas_maos[0]['coordenadas'][4]
+        index_finger_tip = todas_maos[0]['coordenadas'][8]
+        # Calculate the Euclidean distance between thumb and index finger tips
+        distance = ((thumb_tip[0] - index_finger_tip[0])**2 + (thumb_tip[1] - index_finger_tip[1])**2)**0.5
+
+        # Print the distance
+        print("Distance between thumb and index finger:", distance)
+
+
         info_dedos_mao1 = dedos_levantados(todas_maos[0])
 
         #calculate the center of the hand
@@ -130,6 +139,9 @@ while cam.isOpened():
                 current_x, current_y = pyautogui.position()
                 delta_x = x - current_x
                 delta_y = y - current_y
+            if distance < 30:
+                pyautogui.click()
+        
 
       
             

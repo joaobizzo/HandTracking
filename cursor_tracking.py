@@ -127,19 +127,10 @@ while cam.isOpened():
 
         x, y = hand_x_center, hand_y_center
         current_x, current_y = pyautogui.position()
-        delta_x = x - current_x
-        delta_y = y - current_y
-        acceleration = 1.5  # Adjust this value to control the acceleration
-        
-        while abs(delta_x) > 1 or abs(delta_y) > 1:
-            delta_x *= acceleration
-            delta_y *= acceleration
-            x = current_x + delta_x
-            y = current_y + delta_y
-            pyautogui.moveTo(x, y, duration=0.3)
-            current_x, current_y = pyautogui.position()
-            delta_x = x - current_x
-            delta_y = y - current_y
+       
+       
+        pyautogui.moveTo(x, y, duration=0.3)
+           
         if distance < 30:
             pyautogui.click()
             cv2.circle(img, (hand_x_center, hand_y_center), 10, black, -1)
@@ -150,7 +141,7 @@ while cam.isOpened():
             
         
     
-    cv2.imshow("Imagem", img)
+    #cv2.imshow("Imagem", img)
     #terminal_sucesso(sucesso)
 
     tecla = cv2.waitKey(1)

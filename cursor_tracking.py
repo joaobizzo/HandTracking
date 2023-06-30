@@ -1,7 +1,7 @@
 import cv2
 import mediapipe as mp
 import pyautogui
-
+import datetime
 
 #definindo parametros da deteccao
 num_hands = 2
@@ -13,7 +13,7 @@ ball_color = (255, 255, 255)
 purple = (255, 0, 255)
 black = (10, 10, 10)
 
-
+previously_time = datetime.time.now()
 
 mp_hands = mp.solutions.hands
 mp_draws = mp.solutions.drawing_utils

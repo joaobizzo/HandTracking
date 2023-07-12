@@ -15,7 +15,7 @@ black = (10, 10, 10)
 
 mp_hands = mp.solutions.hands
 mp_draws = mp.solutions.drawing_utils
-maos = mp_hands.Hands(min_detection_confidence=min_detection_confidence, min_tracking_confidence=min_tracking_confidence)
+hands = mp_hands.Hands(min_detection_confidence=min_detection_confidence, min_tracking_confidence=min_tracking_confidence)
 
 #initialize the previous verification time
 prev_verification_time = datetime.datetime.now()
@@ -34,71 +34,71 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 # function to inform if the hand was detected correctly
-def terminal_sucesso(sucesso):
-    if sucesso:
-        terminal = "Mao detectada"
+def terminal_sucess(success):
+    if success:
+        terminal = "Hand detected"
     else:
-        terminal = "Mao nao detectada"
+        terminal = "Hand not detected"
     print(terminal)
 
 
 # main function to find hand coordinates
-def encontra_coord_maos(img, espelho=False):
-    if espelho:
+def find_hand_coordinates(img, mirror=False):
+    if mirror:
         # mirror the image
         img = cv2.flip(img, 1)
     # Convert from RGB to BGR (OpenCV default)
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    resultado = maos.process(img_rgb)
-    todas_maos = []
+    result = hands.process(img_rgb)
+    all_hands = []
 
-    if resultado.multi_hand_landmarks:
-        for lado_mao, marcacoes_maos in zip(resultado.multi_handedness, resultado.multi_hand_landmarks):
-            info_mao = {}
-            coordenadas = []
-            for marcacao in marcacoes_maos.landmark:
-                coord_x, coord_y, coord_z = int(marcacao.x * resolution_x), int(marcacao.y * resolution_y), int(marcacao.z * resolution_x)
-                coordenadas.append([coord_x, coord_y, coord_z])
-            info_mao["coordenadas"] = coordenadas
+    if result.multi_hand_landmarks:
+        for hand_side, hand_landmarks in zip(result.multi_handedness, result.multi_hand_landmarks):
+            hand_info = {}
+            coordinates = []
+            for landmark in hand_landmarks.landmark:
+                coord_x, coord_y, coord_z = int(landmark.x * resolution_x), int(landmark.y * resolution_y), int(landmark.z * resolution_x)
+                coordinates.append([coord_x, coord_y, coord_z])
+            hand_info["coordinates"] = coordinates
 
-            todas_maos.append(info_mao)
-            mp_draws.draw_landmarks(img, marcacoes_maos, mp_hands.HAND_CONNECTIONS,
+            all_hands.append(hand_info)
+            mp_draws.draw_landmarks(img, hand_landmarks, mp_hands.HAND_CONNECTIONS,
                                     mp_draws.DrawingSpec(color=ball_color, thickness=2, circle_radius=2),
                                     mp_draws.DrawingSpec(color=line_color, thickness=2, circle_radius=2))
-        sucesso = True
+        sucess = True
     else:
-        sucesso = False
+        sucess = False
     
-    return img, todas_maos, sucesso
+    return img, all_hands, sucess
 
 
 # function to determine if the hand is open or closed
-def dedos_levantados(mao):
-    dedos = []
-    for ponta_dedo in 8, 12, 16, 20:
-        if mao['coordenadas'][ponta_dedo][1] < mao['coordenadas'][ponta_dedo - 2][1]:
-            dedos.append(True)
+def fingers_raised(hand):
+    fingers = []
+    for finger_tip in 8, 12, 16, 20:
+        if hand['coordinates'][finger_tip][1] < hand['coordinates'][finger_tip - 2][1]:
+            fingers.append(True)
         else:
-            dedos.append(False)
-    return dedos
+            fingers.append(False)
+    return fingers
 
 
 # main loop of the cod
 while cam.isOpened():
-    sucesso_camera, img = cam.read()
-    img, todas_maos, sucesso = encontra_coord_maos(img, espelho=True)
+    sucess_camera, img = cam.read()
+    img, all_hands, sucess = find_hand_coordinates(img, mirror=True)
     
-    if len(todas_maos) == 1:
-        thumb_tip = todas_maos[0]['coordenadas'][4]
-        index_finger_tip = todas_maos[0]['coordenadas'][8]
+    if len(all_hands) == 1:
+        thumb_tip = all_hands[0]['coordinates'][4]
+        index_finger_tip = all_hands[0]['coordinates'][8]
         # Calculate the Euclidean distance between thumb and index finger tips
         distance = ((thumb_tip[0] - index_finger_tip[0])**2 + (thumb_tip[1] - index_finger_tip[1])**2)**0.5
 
-        info_dedos_mao1 = dedos_levantados(todas_maos[0])
+        hand_fingers_info = fingers_raised(all_hands[0])
 
         #calculate the center of the hand
-        hand_x_center = todas_maos[0]['coordenadas'][9][0]
-        hand_y_center = todas_maos[0]['coordenadas'][9][1]
+        hand_x_center = all_hands[0]['coordinates'][9][0]
+        hand_y_center = all_hands[0]['coordinates'][9][1]
         
         cv2.circle(img, (hand_x_center, hand_y_center), 10, purple, -1)
         
@@ -111,12 +111,11 @@ while cam.isOpened():
     prev_verification_time = current_time
 
     print("Response time:", response_time)
-    cv2.imshow("Imagem", img)
+    cv2.imshow("Image", img)
     
-    tecla = cv2.waitKey(1)
-    if tecla == 27: #  esc
+    key = cv2.waitKey(1)
+    if key == 27: #  esc
         break
 
 cam.release()
 cv2.destroyAllWindows()
-

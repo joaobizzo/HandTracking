@@ -83,6 +83,10 @@ def fingers_raised(hand):
     return fingers
 
 
+
+#still trying to find the right way to save the data
+
+'''
 # Function to get hand connections data
 def get_hand_data(all_hands):
     hand_data = []
@@ -96,7 +100,7 @@ def get_hand_data(all_hands):
             connections.append(coordinates1 + coordinates2)
         hand_data.append(connections)
     return hand_data
-
+'''
 
 # Main loop of the code
 while cam.isOpened():
